@@ -1,13 +1,9 @@
 const bcrypt = require("bcrypt");
 const logger = require('../logger/logger');
-const passwordHashing = (password) => {
+const passwordHashing = async (password) => {
     const saltRounds = 10;
-    bcrypt.genSalt(saltRounds, (err,salt) => {
-        bcrypt.hash(password, salt, (err, hash) => {
-            logger.info(hash);
-            return hash;
-        });
-    })
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    return hashedPassword;
 }
 
 module.exports = passwordHashing;
