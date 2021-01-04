@@ -2,6 +2,7 @@ const router = require("express").Router();
 const logger = require("../../utils/logger/logger");
 const User = require("../../mongoose/schema/User"); // Bring in mongodb model ( Schema )
 const passwordHashing = require("../../utils/bcrypt/passwordHashing");
+const vaildateUserInfomation = require("../../utils/vaildation/userVaildation");
 
 router.get("/", (req, res) => {
   const { password, username } = req.body;
@@ -15,63 +16,62 @@ router.get("/", (req, res) => {
 });
 
 
-function vaildateEmail(email){
-  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return re.test(email);
-}
+
 async function getIsUsernameAvailable(username){
  let user =  await User.findOne({ username }).exec();
  return user;
 }
 
+async function getIsEmailAvailable(email){
+  let user =  await User.findOne({ emailAddress: email }).exec();
+ return user;
+}
 
-function vaildateUserInfomation(user){
-  if(typeof user.firstName !== "string" || user.firstName.length === 0){
-    return [false, "Enter A Vaild First Name"]
-  }
-  if(typeof user.lastName !== "string" || user.lastName.length === 0){
-    return [false, "Enter A Vaild Last Name"]
-  }
-  if(typeof user.username !== "string" || user.username.length === 0){
-    return [false, "Enter A Vaild  Username"]
-  }
-  // check if user exist
-  if(typeof user.password !== "string" || user.password.length === 0){
-    return [false, "Enter A Vaild Password"]
-  }
-  
-  if(typeof user.emailAddress !== "string" || user.emailAddress.length === 0 || !vaildateEmail(user.emailAddress) ){
-    return [false, "Enter A Vaild Email"];
+async function getIsEmailAndUsernameAvailable(user){
+  let {emailAddress, username} = user;
+  let feedback = {};
+  let isUsernameAvailable = await getIsUsernameAvailable(username)
+  if(isUsernameAvailable){
+    feedback.message = "Username already exist";  
+    feedback.status = false;
+    return feedback;
   }
 
-  if(typeof user.phoneNumber !== "number"){
-    return [false, "Enter A Vaild Phone Number"];
-  }else{
-    let numberLength = user.phoneNumber.toString().length;
-    if(numberLength !== 10){
-      return [false, "Phone number must be 10 digits"];
-    }
+  let isEmailAvailable = await getIsEmailAvailable(emailAddress);
+  if(isEmailAvailable){
+    feedback.message = "Email already exist";  
+    feedback.status = false;
+    return feedback;
   }
-  return [true];
-};
-
+    feedback.message = null;  
+    feedback.status = true;
+    return feedback;
+}
 
 router.post("/", async (req, res) => {
   let user = {firstName, lastName, username, password, emailAddress, phoneNumber} = req.body;
   try {
+    user.firstName = user.firstName.trim();
+    user.lastName = user.lastName.trim();
+    user.username = user.username.trim();
     let isUserInfomationVaild = vaildateUserInfomation(user);
+
     if(isUserInfomationVaild[0]){
-      let isUsernameAvailable = await getIsUsernameAvailable(user.username)
-        if(isUsernameAvailable){
-          res.send("Username already exist");
+        let isEmailAndUsernameAvailable = await getIsEmailAndUsernameAvailable(user);
+        if(!isEmailAndUsernameAvailable.status){
+          res.send(isEmailAndUsernameAvailable.message);
           return;
         }
+        
         user.password = await passwordHashing(password); // Bcrypt Hashing Algorthim For Regular Password => Converted
         let newUser = new User(user);
+        
+        // We want to set up jsonwebtoken 
+        
         //await newUser.save(); // Saving New User To MongoDb
-        res.send(newUser).status(201);
+        res.json(newUser).status(201);
     }else{
-      res.send(isUserInfomation[1]).status(201);
+      res.send(isUserInfomationVaild[1]).status(201);
     }
   } catch (err) {
     logger.error(err);
