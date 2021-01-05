@@ -7,8 +7,6 @@ const generateAccessToken = require("../../utils/authencation/generateAccessToke
 const authencationToken = require("../../utils/authencation/authToken");
 
 
-
-
  const findByUsername = async (username) => {
   let user =  await User.findOne({ username }).exec();
   return user;
@@ -19,23 +17,21 @@ const authencationToken = require("../../utils/authencation/authToken");
   return user;
  }
 
-
 router.get("/", authencationToken, async (req, res) => {
   const isUserInDatabase = await findByUsername(req.username);
-
   if(!isUserInDatabase){
-    logger.info(isUserInDatabase);
-    res.send("Not Found In Database");
+    res.send("User Not Found In Database");
     return;
   }
-  const {password} = isUserInDatabase;
-
-  // if password is correct return info
-  // else
-  // else return not exist
-  res.send("Api Workings");
+  res.json(isUserInDatabase);
 });
 
+
+router.post("/login", (req,res) => {
+  // Get User 
+  // Check Username => true => Check password => false => send reponse 
+  // if password is correct => send user data & token => else => reponse
+})
 
 async function getIsEmailAndUsernameAvailable(user){
   let {emailAddress, username} = user;
