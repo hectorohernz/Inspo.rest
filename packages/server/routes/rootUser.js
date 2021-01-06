@@ -5,14 +5,15 @@ const passwordHashing = require("../../utils/bcrypt/passwordHashing");
 const vaildateUserInfomation = require("../../utils/vaildation/userVaildation");
 const generateAccessToken = require("../../utils/authencation/generateAccessToken");
 const authencationToken = require("../../utils/authencation/authToken");
+const compareHashedPassword = require("../../utils/bcrypt/compareHashedPassword");
 
-
+// Find Username in the mongodb based on username
  const findByUsername = async (username) => {
   let user =  await User.findOne({ username }).exec();
   return user;
  }
  
- async function getIsEmailAvailable(email){
+ async function findByEmail(email){
    let user =  await User.findOne({ emailAddress: email }).exec();
   return user;
  }
@@ -27,10 +28,30 @@ router.get("/", authencationToken, async (req, res) => {
 });
 
 
-router.post("/login", (req,res) => {
-  // Get User 
-  // Check Username => true => Check password => false => send reponse 
-  // if password is correct => send user data & token => else => reponse
+router.post("/login", async (req,res) => {
+  const {username,password} = req.body;
+  const user = await findByUsername(username);
+  const responseMessage = {};
+
+  if(!user){
+    responseMessage.message = "User Doesn't Exist";
+    responseMessage.token = null;
+    responseMessage.success = false;
+    return res.json(responseMessage);
+  }
+  
+  let isPasswordTheSameAsHashed = await compareHashedPassword(password,user.password);
+
+  if(!isPasswordTheSameAsHashed){
+      responseMessage.message = "Password don't match!";
+      responseMessage.token = null;
+      responseMessage.success = false;
+      return res.json(responseMessage);
+  }
+  responseMessage.message = "Token Granted";
+  responseMessage.token = generateAccessToken(username);
+  responseMessage.success = true;
+  return res.json(responseMessage);
 })
 
 async function getIsEmailAndUsernameAvailable(user){
@@ -43,7 +64,7 @@ async function getIsEmailAndUsernameAvailable(user){
     return feedback;
   }
 
-  let isEmailAvailable = await getIsEmailAvailable(emailAddress);
+  let isEmailAvailable = await findByEmail(emailAddress);
   if(isEmailAvailable){
     feedback.message = "Email already exist";  
     feedback.status = false;
@@ -72,7 +93,7 @@ router.post("/", async (req, res) => {
         let newUser = new User(user);
         
         //await newUser.save(); // Saving New User To MongoDb
-        let token = generateAccessToken({username:newUser.username});
+        let token = generateAccessToken(newUser.username);
         res.json(token).status(201);
     }else{
       res.send(isUserInfomationVaild[1]).status(201);
