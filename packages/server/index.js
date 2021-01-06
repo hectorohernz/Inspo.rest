@@ -9,7 +9,7 @@ const PORT = localConfig.port || process.env.PORT;
 
 connectToMongo();
 app.use(bodyParser.json()); // support json encoded bodies
-app.use("/user", require("./routes/rootUser.js"));
+app.use("/user", require("./routes/rootUser"));
 
 app.get("/",(req,res) => {
     logger.info("Home Page Connected");
