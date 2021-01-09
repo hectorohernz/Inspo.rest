@@ -1,5 +1,8 @@
 const vaildateEmail = require("./emailVaildation");
 function vaildateUserInfomation(user){
+    user.firstName = user.firstName.trim();
+    user.lastName = user.lastName.trim();
+    user.username = user.username.trim();
     if(typeof user.firstName !== "string" || user.firstName.length === 0){
       return [false, "Enter A Vaild First Name"]
     }

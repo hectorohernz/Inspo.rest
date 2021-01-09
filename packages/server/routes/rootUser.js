@@ -6,8 +6,6 @@ const vaildateUserInfomation = require("../../utils/vaildation/userVaildation");
 const generateAccessToken = require("../../utils/authencation/generateAccessToken");
 const authencationToken = require("../../utils/authencation/authToken");
 const compareHashedPassword = require("../../utils/bcrypt/compareHashedPassword");
-
-// Find Username in the mongodb based on username
  const findByUsername = async (username) => {
   let user =  await User.findOne({ username }).exec();
   return user;
@@ -18,13 +16,18 @@ const compareHashedPassword = require("../../utils/bcrypt/compareHashedPassword"
   return user;
  }
 
-router.get("/", authencationToken, async (req, res) => {
-  const isUserInDatabase = await findByUsername(req.username);
+
+ router.get("/", authencationToken, async (req, res) => {
+  const isUserInDatabase =  await findByUsername(req.username);
+
   if(!isUserInDatabase){
     res.send("User Not Found In Database");
     return;
   }
-  res.json(isUserInDatabase);
+
+  let user = {firstName, lastName, username, emailAddress, phoneNumber, _id} = isUserInDatabase;
+ 
+  res.json(user);
 });
 
 
@@ -78,11 +81,7 @@ async function getIsEmailAndUsernameAvailable(user){
 router.post("/", async (req, res) => {
   let user = {firstName, lastName, username, password, emailAddress, phoneNumber} = req.body;
   try {
-    user.firstName = user.firstName.trim();
-    user.lastName = user.lastName.trim();
-    user.username = user.username.trim();
     let isUserInfomationVaild = vaildateUserInfomation(user);
-
     if(isUserInfomationVaild[0]){
         let isEmailAndUsernameAvailable = await getIsEmailAndUsernameAvailable(user);
         if(!isEmailAndUsernameAvailable.status){
@@ -103,5 +102,46 @@ router.post("/", async (req, res) => {
     res.send(err).status(501);
   }
 });
+
+router.put("/", authencationToken, async (req,res) => {
+  let user = {firstName, lastName, username, password, emailAddress, phoneNumber} = req.body;
+  try{
+    let isUserInfomationVaild = vaildateUserInfomation(user);
+    if(isUserInfomationVaild[0]){
+      let isEmailAndUsernameAvailable = await getIsEmailAndUsernameAvailable(user);
+      
+      if(!isEmailAndUsernameAvailable.status){
+        res.send(isEmailAndUsernameAvailable.message);
+        return;
+      }
+
+      user.password = await passwordHashing(password); 
+      let token = generateAccessToken({username:user.username});
+      res.json(token).status(201);
+      return;
+    
+    }else{
+      res.send(isUserInfomationVaild[1]).status(201);
+      return;
+    }
+  }catch(err){
+    logger.error(err);
+    res.send(err).status(501);
+    return;
+  }
+});
+
+
+router.delete("/", authencationToken, async (req,res) => {
+  let user = {firstName, lastName, username, password, emailAddress, phoneNumber} = req.body;
+  try {
+    let isUserDeleted = await User.deleteOne({username: user.username});
+    return res.send(isUserDeleted); 
+  } catch (err) {
+    logger.error(err);
+    res.send(err).status(501);
+    return;
+  }
+})
 
 module.exports = router;
