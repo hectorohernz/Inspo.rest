@@ -1,7 +1,19 @@
 # INSPO.REST
-INSPO.REST is a Restful NodeJs Api for INSPO.
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Road Map 
+- [x] Get Request for user 
+    - [x] Authencation Token JWT To Access
+        - [x] Return User | Return Message and Status 404
+- [x] Post Request for User for creating profile
+- [x] Post For Log In 
+    - [x] Check Username 
+        - If User Exist continue | Else Message To Client 
+        - [x] Check Password 
+            - [x] Compare Password with bcrypt
+            - [x]  If Password & Username match continue || else Send Message
+            - [x] Send JWT 
+- [ ] Put Request for User
+     - [ ] Authencation Token JWT To Access
+- [ ] Delete Request for User 
+- [ ] Authencation Token JWT To Access
 
-Please make sure to update tests as appropriate.
