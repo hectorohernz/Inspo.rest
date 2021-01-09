@@ -11,19 +11,23 @@ const compareHashedPassword = require("../../utils/bcrypt/compareHashedPassword"
   return user;
  }
  
- async function getIsEmailAvailable(email){
+ async function findByEmail(email){
    let user =  await User.findOne({ emailAddress: email }).exec();
   return user;
  }
 
 
  router.get("/", authencationToken, async (req, res) => {
-  const isUserInDatabase = await findByUsername(req.username);
+  const isUserInDatabase =  await findByUsername(req.username);
+
   if(!isUserInDatabase){
     res.send("User Not Found In Database");
     return;
   }
-  res.json(isUserInDatabase);
+
+  let user = {firstName, lastName, username, emailAddress, phoneNumber, _id} = isUserInDatabase;
+ 
+  res.json(user);
 });
 
 
@@ -63,7 +67,7 @@ async function getIsEmailAndUsernameAvailable(user){
     return feedback;
   }
 
-  let isEmailAvailable = await getIsEmailAvailable(emailAddress);
+  let isEmailAvailable = await findByEmail(emailAddress);
   if(isEmailAvailable){
     feedback.message = "Email already exist";  
     feedback.status = false;
@@ -88,7 +92,7 @@ router.post("/", async (req, res) => {
         let newUser = new User(user);
         
         //await newUser.save(); // Saving New User To MongoDb
-        let token = generateAccessToken({username:newUser.username});
+        let token = generateAccessToken(newUser.username);
         res.json(token).status(201);
     }else{
       res.send(isUserInfomationVaild[1]).status(201);
