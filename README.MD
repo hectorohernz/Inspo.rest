@@ -27,3 +27,15 @@ Road Map
 
 - Jan/10 Note 
     - Keep testing endpoints for auth & jwt
+    - Reduce Clutter Code => cleaner code reduce and abstract
+    - Test all user controller with jest
+    - convert from rest to user.controller.js
+
+
+_________________________________________
+
+User Stories 
+- Reduce Code In Endpoint By Seperating Code From rootUser.js To user.controller.js
+- Reduce Functions that vaildate Schema with mongoose Schema
+- Use Mongoose Vaildation instead of in house vaildation
+- Send Reponse to user

@@ -2,26 +2,17 @@ const router = require("express").Router();
 const logger = require("../../utils/logger/logger");
 const User = require("../../mongoose/schema/User"); // Bring in mongodb model ( Schema )
 const passwordHashing = require("../../utils/bcrypt/passwordHashing");
-const vaildateUserInfomation = require("../../utils/vaildation/userVaildation");
 const generateAccessToken = require("../../utils/authencation/generateAccessToken");
 const authencationToken = require("../../utils/authencation/authToken");
 const compareHashedPassword = require("../../utils/bcrypt/compareHashedPassword");
+const UserController = require("../controller/user.controller");
 
-// Searches for User By Username
-const findByUsername = async (username) => {
-  let user = await User.findOne({ username }).exec();
-  return user;
-};
+router.route("/").post(UserController.createUser);
+router.put("/",authencationToken, UserController.updateUser);
 
-// Searches for User By Email
-async function findByEmail(email) {
-  let user = await User.findOne({ emailAddress: email }).exec();
-  return user;
-}
 
 router.get("/", authencationToken, async (req, res) => {
   const isUserInDatabase = await findByUsername(req.username);
-
   let user = ({
     firstName,
     lastName,
@@ -36,7 +27,8 @@ router.get("/", authencationToken, async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  const user = await findByUsername(username);
+  const user = await User.findOne({username: username});
+  logger.info(user);
   const responseMessage = {};
 
   if (!user) {
@@ -84,39 +76,7 @@ async function getIsEmailAndUsernameAvailable(user) {
   return feedback;
 }
 
-router.post("/", async (req, res) => {
-  let user = ({
-    firstName,
-    lastName,
-    username,
-    password,
-    emailAddress,
-    phoneNumber,
-  } = req.body);
-  try {
-    let isUserInfomationVaild = vaildateUserInfomation(user);
-    if (isUserInfomationVaild[0]) {
-      let isEmailAndUsernameAvailable = await getIsEmailAndUsernameAvailable(
-        user
-      );
-      if (!isEmailAndUsernameAvailable.status) {
-        res.json(isEmailAndUsernameAvailable.message);
-        return;
-      }
-      user.password = await passwordHashing(password); // Bcrypt Hashing Algorthim For Regular Password => Converted
-      let newUser = new User(user);
 
-      await newUser.save(); // Saving New User To MongoDb
-      let token = generateAccessToken(newUser.username);
-      res.json(token).status(201);
-    } else {
-      res.json(isUserInfomationVaild[1]).status(201);
-    }
-  } catch (err) {
-    logger.error(err);
-    res.send(err).status(501);
-  }
-});
 
 router.put("/", authencationToken, async (req, res) => {
   let user = ({
