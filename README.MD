@@ -17,3 +17,13 @@ Road Map
 - [ ] Delete Request for User 
 - [ ] Authencation Token JWT To Access
 
+- Test User Routes with Jest and Insommia
+    - [ ]  Test getting a user that exist in the database based on username and password => return jwt token 
+    - [ ]  Test updating a user that exist in the database => Return new jwt token 
+        - [ ] New Username && Username that already exist in the database => return username must be unique
+        - [ ] Update password and hash new password 
+    - [ ] Test creating a new user 
+    - [ ] Test deleting a user 
+
+- Jan/10 Note 
+    - Keep testing endpoints for auth & jwt

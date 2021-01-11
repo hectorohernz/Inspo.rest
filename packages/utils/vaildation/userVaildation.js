@@ -10,7 +10,7 @@ function vaildateUserInfomation(user){
       return [false, "Enter A Vaild Last Name"]
     }
     if(typeof user.username !== "string" || user.username.length === 0){
-      return [false, "Enter A Vaild  Username"]
+      return [false, "Enter A Vaild Username"]
     }
     // check if user exist
     if(typeof user.password !== "string" || user.password.length === 0){
