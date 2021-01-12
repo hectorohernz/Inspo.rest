@@ -38,19 +38,20 @@ const customErrorHelper = (errorMessage) => {
       message = `${convertFieldForMessage(field)} already exists`;
       listOfError.push(message);
     }
-  } else {
-    /*
-            Checks for required fields    
-    */
+    return listOfError;
+  } 
+
+  if(errorMessage.errors.length !== 0){
     for (let errName in errorMessage.errors) {
       if (errorMessage.errors[errName].message) {
         let message = errorMessage.errors[errName].message;
         listOfError.push(message);
       }
     }
+    return listOfError;
   }
 
-  return listOfError;
+  return errorMessage
 };
 
 module.exports = customErrorHelper;

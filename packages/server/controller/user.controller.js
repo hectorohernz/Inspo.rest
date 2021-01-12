@@ -19,11 +19,17 @@ const createUser = async (req,res) => {
 const updateUser = async (req,res) => {
     let user = req.body.user;
       try {
-        await User.findOne({username: req.username});
+        await User.findOneAndUpdate({username:req.username}, user,{ runValidators: true });
+        let token = generateAccessToken(user.username);
+        return res.status(200).json({
+            message: "Successfully updated account",
+            token:token
+        });
     } catch (error) {
         return res.status(400).json({error:UserVaildationHelper(error)});
     }
 }
+
 
 /*
 const getUser = async (req,res) => {
@@ -31,12 +37,19 @@ const getUser = async (req,res) => {
 
 }
 
+*/
 
 const deleteUser = async (req,res) => {
-
-
+    try {
+        await User.deleteOne({username:req.username});
+        return res.status(200).json({
+            message: "Successfully Deleted User"
+        })
+    } catch (error) {
+        return res.status(400).json({error:UserVaildationHelper(error)});
+    }
 };
-*/
+
 
 
 module.exports = {

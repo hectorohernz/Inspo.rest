@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const passwordHashing = require("../../utils/bcrypt/passwordHashing");
 const comparePassword = require("../../utils/bcrypt/compareHashedPassword");
-
+const logger = require("../../utils/logger/logger");
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -54,6 +54,13 @@ userSchema.pre("save", async function (next) {
   user.password = await passwordHashing(user.password);
   next();
 });
+
+userSchema.pre("findOneAndUpdate", async function (next) {
+  let password = this._update.password;
+  this._update.password = await passwordHashing(password);
+  next();
+});
+
 
 
 
