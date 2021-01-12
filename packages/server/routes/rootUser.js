@@ -43,12 +43,7 @@ router.post("/login", async (req, res) => {
     user.password
   );
 
-  if (!isPasswordTheSameAsHashed) {
-    responseMessage.message = "Password don't match!";
-    responseMessage.token = null;
-    responseMessage.success = false;
-    return res.json(responseMessage);
-  }
+  
   responseMessage.message = "Token Granted";
   responseMessage.token = generateAccessToken(username);
   responseMessage.success = true;
@@ -76,43 +71,6 @@ async function getIsEmailAndUsernameAvailable(user) {
   return feedback;
 }
 
-
-
-router.put("/", authencationToken, async (req, res) => {
-  let user = ({
-    firstName,
-    lastName,
-    username,
-    password,
-    emailAddress,
-    phoneNumber,
-  } = req.body);
-  try {
-    let isUserInfomationVaild = vaildateUserInfomation(user);
-    if (isUserInfomationVaild[0]) {
-      let isEmailAndUsernameAvailable = await getIsEmailAndUsernameAvailable(
-        user
-      );
-
-      if (!isEmailAndUsernameAvailable.status) {
-        res.send(isEmailAndUsernameAvailable.message);
-        return;
-      }
-
-      user.password = await passwordHashing(password);
-      let token = generateAccessToken({ username: user.username });
-      res.json(token).status(201);
-      return;
-    } else {
-      res.send(isUserInfomationVaild[1]).status(201);
-      return;
-    }
-  } catch (err) {
-    logger.error(err);
-    res.send(err).status(501);
-    return;
-  }
-});
 
 router.delete("/", authencationToken, async (req, res) => {
   let user = ({ username, password } = req.body);
