@@ -1,7 +1,15 @@
 # INSPO.REST
 
-## Still Under Development
+INSPO.REST is a web app backend for INSPO frontend web applcation. 
 
+Inspo is a widget template based social networking web application.
+
+Inspo is idea sounds mood boards of different people and allowing people to have the opportunity to customize their profile. 
+
+Thrive. Create. Explr
+
+
+## Still Under Development
 Inspo.Rest is an api for 
 - Creating User 
     - [ ] Test Empty Last Name
