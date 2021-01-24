@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const passwordHashing = require("../../utils/bcrypt/passwordHashing");
 const comparePassword = require("../../utils/bcrypt/compareHashedPassword");
 const logger = require("../../utils/logger/logger");
+
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
