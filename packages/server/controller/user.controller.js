@@ -14,7 +14,9 @@ const createUser = async (req, res) => {
       token: token,
     });
   } catch (error) {
-    return res.status(400).json({ error: UserVaildationHelper(error) });
+    return res
+      .status(400)
+      .json({ error: UserVaildationHelper(error), status: false });
   }
 };
 
@@ -30,38 +32,42 @@ const updateUser = async (req, res) => {
       token: token,
     });
   } catch (error) {
-    return res.status(400).json({ error: UserVaildationHelper(error) });
+    return res
+      .status(400)
+      .json({ error: UserVaildationHelper(error), status: false });
   }
-};
+}; 
 
 const getUser = async (req, res) => {};
 
 const login = async (req, res) => {
-  const user = { username, password } = req.body;
-
+  const user = ({ username, password } = req.body);
+  console.log(user);
   try {
     let getUser = await User.findOne({ username: user.username });
-
     if (!getUser) {
       return res.status(400).json({
         message: "User Doesn't Exist",
+        status: false,
       });
     }
-    console.log(getUser);
+
     const isMatch = await comparePassword(user.password, getUser.password);
 
     if (!isMatch) {
       return res.status(400).json({
         message: "Password Doesn't Match",
+        status: false,
       });
     }
 
     let token = generateAccessToken(getUser.username);
 
     return res.status(200).json({
-        message:"Successfully Login",
-        token: token
-    })
+      message: "Successfully Login",
+      status: true,
+      token: token,
+    });
   } catch (err) {
     return res.status(400).json({ error: UserVaildationHelper(err) });
   }
@@ -74,15 +80,17 @@ const deleteUser = async (req, res) => {
       message: "Successfully Deleted User",
     });
   } catch (error) {
-    return res.status(400).json({ error: UserVaildationHelper(error) });
+    return res.status(400).json({
+      error: UserVaildationHelper(error),
+      status: false,
+    });
   }
 };
-
 
 module.exports = {
   createUser,
   updateUser,
   login,
   deleteUser,
-  getUser
+  getUser,
 };
