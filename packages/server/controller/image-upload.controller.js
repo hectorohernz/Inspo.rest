@@ -7,10 +7,9 @@ const singleUpload = uploadImageToBucket.single("image");
 const uploadImage = (req,res) => {
     singleUpload(req,res, (err) => {
         if(err){
-            return res.status(422).json(err);
+            return err
         }
-
-        return res.json({"imageUrl": req.file.location})
+        return {"imageUrl": req.file.location}
     });
 };  
 

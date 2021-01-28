@@ -17,7 +17,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(bodyParser.json()); // support json encoded bodies
-app.use("/api/user", require("./routes/rootUser"));
+app.use("/api/user", require("./routes/rootUser.api"));
+app.use("/api/info", require("./routes/UserInfo.api"));
+
 
 app.listen(PORT, () =>{
     console.log(`"http://localhost:${PORT}`);
