@@ -1,8 +1,5 @@
 const uploadImageToBucket = require("../services/imageUpload");
-
-// Image will be the body reponse 
 const singleUpload = uploadImageToBucket.single("image");
-
 
 const uploadImage = (req,res) => {
     singleUpload(req,res, (err) => {

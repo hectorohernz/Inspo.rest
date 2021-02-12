@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 
 const UserInfoSchema = new mongoose.Schema({
     user:{
-        type: mongoose.Schema.Types.String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "users"
     },
     profileImageUrl:{
-        type:String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "userimage"
     },
     meta:[{
         title:String,
