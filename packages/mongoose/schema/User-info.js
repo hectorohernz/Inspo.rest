@@ -1,15 +1,18 @@
-const {Schema} = "mongoose";
+const mongoose = require("mongoose");
 
-const UserInfoSchema = new Schema({
+const UserInfoSchema = new mongoose.Schema({
     user:{
-        type: Schema.Types.ObjectId,
-        ref:"user"
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users"
     },
-    profileImage:{
-        url: String
+    profileImageUrl:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "userimage"
     },
     meta:[{
         title:String,
         link:String
     }]
 })
+
+module.exports =  UserInfo = mongoose.model("UserInfo", UserInfoSchema);
