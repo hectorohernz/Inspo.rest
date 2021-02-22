@@ -44,3 +44,5 @@ Inspo.Rest uses a number of open source projects to work properly:
     * http://localhost:5000/api/user
         * Token: Needed
         * Method: Delete
+
+
