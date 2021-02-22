@@ -41,6 +41,8 @@ const upload = multer({
             cb(null,Date.now().toString() + getExtention(file));
         }
     })
-})
+});
+
+
 
 module.exports =  upload;
